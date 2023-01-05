@@ -2,13 +2,18 @@ package main
 
 import (
 	db "IMChat/db/pg/sqlc"
+	"IMChat/gapi"
+	"IMChat/pb"
 	"IMChat/utils/config"
 	"database/sql"
 	"log"
+	"net"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
 	_ "github.com/lib/pq"
 )
@@ -26,9 +31,11 @@ func main() {
 
 	runDBMigrate(conf.Postgres.Migration.MigrateUrl, conf.Postgres.Source)
 
-	db.NewStore(conn)
+	store := db.NewStore(conn)
 
 	log.Println("start server successfully")
+
+	runGrpcServer(store)
 }
 
 func runDBMigrate(migrationUrl, dbSource string) {
@@ -42,4 +49,22 @@ func runDBMigrate(migrationUrl, dbSource string) {
 	}
 
 	log.Println("db migrated successfully")
+}
+
+func runGrpcServer(store db.Store) {
+	server := gapi.NewServer(store)
+
+	grpcServer := grpc.NewServer()
+	pb.RegisterUserServiceServer(grpcServer, server)
+	reflection.Register(grpcServer)
+
+	listener, err := net.Listen("tcp", ":9090")
+	if err != nil {
+		log.Fatal("cannot create listener: ", err)
+	}
+	log.Printf("start gRPC server: %s", listener.Addr().String())
+	err = grpcServer.Serve(listener)
+	if err != nil {
+		log.Fatal("cannot start server: ", err)
+	}
 }
