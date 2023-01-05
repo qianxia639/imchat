@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package=".;pb";
+
+message User {
+    string username = 1;
+    string email = 2;
+    string nickname = 3;
+    string password = 4;
+    string gender = 5;
+}
+// https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.21.12.tar.gz

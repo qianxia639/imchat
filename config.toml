@@ -1,0 +1,7 @@
+[postgres]
+driver = "postgres"
+source = "postgresql://root:root@localhost:5432/imchat?sslmode=disable"
+
+    [postgres.migration]
+        migrate_url = "file://db/pg/migration"
+        # /opt/qianxia/imchat/db/pg/migration
