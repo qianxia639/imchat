@@ -1,5 +1,7 @@
 package config
 
+import "time"
+
 type Config struct {
 	Postgres struct {
 		Driver    string `mapstructure:"driver"`
@@ -7,5 +9,12 @@ type Config struct {
 		Migration struct {
 			MigrateUrl string `mapstructure:"migrate_url"`
 		} `mapstructure:"migration"`
+	}
+	Server struct {
+		GrpcServerAddress string `mapstructure:"grpc_server_address"`
+	}
+	Token struct {
+		TokenSymmetricKey   string        `mapstructure:"token_symmetric_key"`
+		AccessTokenDuration time.Duration `mapstructure:"access_token_duration"`
 	}
 }

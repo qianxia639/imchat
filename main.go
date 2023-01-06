@@ -33,9 +33,7 @@ func main() {
 
 	store := db.NewStore(conn)
 
-	log.Println("start server successfully")
-
-	runGrpcServer(store)
+	runGrpcServer(conf, store)
 }
 
 func runDBMigrate(migrationUrl, dbSource string) {
@@ -51,8 +49,8 @@ func runDBMigrate(migrationUrl, dbSource string) {
 	log.Println("db migrated successfully")
 }
 
-func runGrpcServer(store db.Store) {
-	server, err := gapi.NewServer(store)
+func runGrpcServer(conf config.Config, store db.Store) {
+	server, err := gapi.NewServer(conf, store)
 	if err != nil {
 		log.Fatal("cannot create server: ", err)
 	}
@@ -61,7 +59,7 @@ func runGrpcServer(store db.Store) {
 	pb.RegisterUserServer(grpcServer, server)
 	reflection.Register(grpcServer)
 
-	listener, err := net.Listen("tcp", ":9090")
+	listener, err := net.Listen("tcp", conf.Server.GrpcServerAddress)
 	if err != nil {
 		log.Fatal("cannot create listener: ", err)
 	}

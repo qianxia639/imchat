@@ -4,22 +4,28 @@ import (
 	db "IMChat/db/pg/sqlc"
 	"IMChat/pb"
 	"IMChat/token"
+	"IMChat/utils/config"
 )
 
 type Server struct {
 	pb.UnimplementedUserServer
 	store      db.Store
 	tokenMaker token.Maker
+	conf       config.Config
 }
 
-const key = "plokmnjiuhbvgytfcxdreszawq564738"
+func NewServer(conf config.Config, store db.Store) (*Server, error) {
 
-func NewServer(store db.Store) (*Server, error) {
-
-	tokenMaker, err := token.NewPasetoMaker(key)
+	tokenMaker, err := token.NewPasetoMaker(conf.Token.TokenSymmetricKey)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Server{store: store, tokenMaker: tokenMaker}, nil
+	server := &Server{
+		store:      store,
+		tokenMaker: tokenMaker,
+		conf:       conf,
+	}
+
+	return server, nil
 }

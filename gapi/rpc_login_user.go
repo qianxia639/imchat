@@ -7,7 +7,6 @@ import (
 	"IMChat/validate"
 	"context"
 	"database/sql"
-	"time"
 
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
@@ -42,7 +41,7 @@ func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 		return nil, status.Errorf(codes.NotFound, "用户名或密码错误: %s", err)
 	}
 
-	token, _, err := server.tokenMaker.CreateToken(user2.Username, time.Hour)
+	token, _, err := server.tokenMaker.CreateToken(user2.Username, server.conf.Token.AccessTokenDuration)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "filed to create access token: %s", err)
 	}
