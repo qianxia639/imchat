@@ -12,9 +12,9 @@ import (
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (
-    username, email, nickname, password, gender, avatar
+    username, email, nickname, password, gender
 ) VALUES(
-    $1, $2, $3, $4, $5, $6
+    $1, $2, $3, $4, $5
 )
 RETURNING id, username, email, nickname, password, gender, avatar, register_time
 `
@@ -25,7 +25,6 @@ type CreateUserParams struct {
 	Nickname string `json:"nickname"`
 	Password string `json:"password"`
 	Gender   int16  `json:"gender"`
-	Avatar   string `json:"avatar"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -35,7 +34,6 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.Nickname,
 		arg.Password,
 		arg.Gender,
-		arg.Avatar,
 	)
 	var i User
 	err := row.Scan(
@@ -63,11 +61,39 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 
 const getUser = `-- name: GetUser :one
 SELECT id, username, email, nickname, password, gender, avatar, register_time FROM users
-WHERE id = $1 LIMIT 1
+WHERE username = $1
+OR email = $1 LIMIT 1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUser, id)
+func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUser, username)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.Nickname,
+		&i.Password,
+		&i.Gender,
+		&i.Avatar,
+		&i.RegisterTime,
+	)
+	return i, err
+}
+
+const loginUser = `-- name: LoginUser :one
+SELECT id, username, email, nickname, password, gender, avatar, register_time FROM users
+WHERE (username = $1 AND password = $2)
+OR (email = $1 AND password = $2) LIMIT 1
+`
+
+type LoginUserParams struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+func (q *Queries) LoginUser(ctx context.Context, arg LoginUserParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, loginUser, arg.Username, arg.Password)
 	var i User
 	err := row.Scan(
 		&i.ID,

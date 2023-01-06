@@ -55,7 +55,7 @@ func runGrpcServer(store db.Store) {
 	server := gapi.NewServer(store)
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterUserServiceServer(grpcServer, server)
+	pb.RegisterUserServer(grpcServer, server)
 	reflection.Register(grpcServer)
 
 	listener, err := net.Listen("tcp", ":9090")

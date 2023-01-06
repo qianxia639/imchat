@@ -4,11 +4,10 @@ package pb;
 
 option go_package="IMChat/pb";
 
-message User {
+message Users {
     string username = 1;
     string email = 2;
     string nickname = 3;
-    string password = 4;
-    string gender = 5;
+    int32 gender = 4;
+    string avatar = 5;
 }
-// https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.21.12.tar.gz

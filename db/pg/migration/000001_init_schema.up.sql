@@ -6,7 +6,7 @@ CREATE TABLE "users" (
   "password" varchar(100) NOT NULL,
   "gender" smallint NOT NULL DEFAULT 3,
   "avatar" varchar(255) NOT NULL DEFAULT ('default.jpg'),
-  "register_time" timestamptz DEFAULT (now())
+  "register_time" timestamptz NOT NULL DEFAULT (now())
 );
 
 COMMENT ON COLUMN "users"."id" IS '主键Id';

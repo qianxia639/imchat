@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package="IMChat/pb";
+
+message UpdateUserRequest {
+    string username = 1;
+    optional string email = 2;
+    optional string nickname = 3;
+    optional string password = 4;
+    optional int32 gender = 5;
+    optional string avatar = 6;
+}
+
+message UpdateUserResponse {
+    // Users user = 1;
+}

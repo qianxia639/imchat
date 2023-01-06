@@ -19,7 +19,7 @@ type User struct {
 	Nickname string `json:"nickname"`
 	// 密码
 	Password string `json:"password"`
-	// 用户性别,1: 男, 2: 女, 3: 未知
+	// 1: 男, 2: 女, 3: 未知
 	Gender int16 `json:"gender"`
 	// 用户头像
 	Avatar string `json:"avatar"`

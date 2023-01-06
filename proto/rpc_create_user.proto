@@ -8,11 +8,12 @@ option go_package="IMChat/pb";
 
 message CreateUserRequest {
     string username = 1;
-    string full_name = 2;
-    string email = 3;
+    string email = 2;
+    string nickname = 3;
     string password = 4;
+    int32 gender = 5;
 }
 
 message CreateUserResponse {
-    User user = 1;
+    Users user = 1;
 }

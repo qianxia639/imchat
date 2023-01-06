@@ -6,7 +6,7 @@ import (
 )
 
 type Server struct {
-	pb.UnimplementedUserServiceServer
+	pb.UnimplementedUserServer
 	store db.Store
 }
 
