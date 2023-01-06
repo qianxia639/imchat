@@ -2,8 +2,10 @@ package token
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
+	"github.com/aead/chacha20poly1305"
 	"github.com/golang-jwt/jwt/v4"
 )
 
@@ -11,8 +13,11 @@ type JWTMaker struct {
 	secretKey string
 }
 
-func NewJwtMaker(secretKey string) Maker {
-	return &JWTMaker{secretKey: secretKey}
+func NewJwtMaker(secretKey string) (Maker, error) {
+	if len(secretKey) != 32 {
+		return nil, fmt.Errorf("invalid key size: must be exactly %d characters", chacha20poly1305.KeySize)
+	}
+	return &JWTMaker{secretKey: secretKey}, nil
 }
 
 func (maker *JWTMaker) CreateToken(username string, duration time.Duration) (string, *Payload, error) {

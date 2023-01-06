@@ -4,14 +4,20 @@ import (
 	db "IMChat/db/pg/sqlc"
 	"IMChat/pb"
 	"IMChat/utils"
+	"IMChat/validate"
 	"context"
 
 	"github.com/lib/pq"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
+	violations := validateCreateUserRequest(req)
+	if violations != nil {
+		return nil, invalidArgumentError(violations)
+	}
 
 	hashPassword, err := utils.HashPassword(req.GetPassword())
 	if err != nil {
@@ -42,4 +48,28 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 	}
 
 	return rsp, nil
+}
+
+func validateCreateUserRequest(req *pb.CreateUserRequest) (violation []*errdetails.BadRequest_FieldViolation) {
+	if err := validate.ValidateEmail(req.GetEmail()); err != nil {
+		violation = append(violation, fieldViolation("email", err))
+	}
+
+	if err := validate.ValidateUsername(req.GetUsername()); err != nil {
+		violation = append(violation, fieldViolation("username", err))
+	}
+
+	if err := validate.ValidateUsername(req.GetNickname()); err != nil {
+		violation = append(violation, fieldViolation("nickname", err))
+	}
+
+	if err := validate.ValidateLen(req.GetPassword(), 3, 20); err != nil {
+		violation = append(violation, fieldViolation("password", err))
+	}
+
+	if err := validate.ValidateGender(req.GetGender()); err != nil {
+		violation = append(violation, fieldViolation("gender", err))
+	}
+
+	return violation
 }

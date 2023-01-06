@@ -4,14 +4,21 @@ import (
 	db "IMChat/db/pg/sqlc"
 	"IMChat/pb"
 	"IMChat/utils"
+	"IMChat/validate"
 	"context"
 	"database/sql"
+	"time"
 
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.LoginUserResponse, error) {
+	violations := validateLoginUserRequest(req)
+	if violations != nil {
+		return nil, invalidArgumentError(violations)
+	}
 
 	user, err := server.store.GetUser(ctx, req.Username)
 	if err != nil {
@@ -35,9 +42,27 @@ func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 		return nil, status.Errorf(codes.NotFound, "用户名或密码错误: %s", err)
 	}
 
+	token, _, err := server.tokenMaker.CreateToken(user2.Username, time.Hour)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "filed to create access token: %s", err)
+	}
+
 	resp := &pb.LoginUserResponse{
-		Token: user2.Username,
+		Token: token,
 	}
 
 	return resp, nil
+}
+
+func validateLoginUserRequest(req *pb.LoginUserRequest) (violation []*errdetails.BadRequest_FieldViolation) {
+
+	if err := validate.NotEmpty(req.GetUsername()); err != nil {
+		violation = append(violation, fieldViolation("username", err))
+	}
+
+	if err := validate.ValidateLen(req.GetPassword(), 3, 20); err != nil {
+		violation = append(violation, fieldViolation("password", err))
+	}
+
+	return violation
 }

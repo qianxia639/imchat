@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package pb;
 
+import "google/protobuf/timestamp.proto";
+
 option go_package="IMChat/pb";
 
 message Users {
@@ -10,4 +12,5 @@ message Users {
     string nickname = 3;
     int32 gender = 4;
     string avatar = 5;
+    google.protobuf.Timestamp register_time = 6;
 }

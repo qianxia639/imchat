@@ -52,7 +52,10 @@ func runDBMigrate(migrationUrl, dbSource string) {
 }
 
 func runGrpcServer(store db.Store) {
-	server := gapi.NewServer(store)
+	server, err := gapi.NewServer(store)
+	if err != nil {
+		log.Fatal("cannot create server: ", err)
+	}
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterUserServer(grpcServer, server)
