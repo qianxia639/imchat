@@ -5,6 +5,7 @@ package pb;
 import "rpc_create_user.proto";
 import "rpc_login_user.proto";
 import "rpc_update_user.proto";
+import "rpc_delete_user.proto";
 
 option go_package="IMChat/pb";
 
@@ -14,5 +15,7 @@ service User {
     rpc LoginUser (LoginUserRequest) returns (LoginUserResponse) {};
 
     rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {};
+
+    rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse) {};
 
 }

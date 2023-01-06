@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package="IMChat/pb";
+
+message DeleteUserRequest {
+    int64 id = 1;
+}
+
+message DeleteUserResponse { }
