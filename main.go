@@ -38,7 +38,7 @@ func main() {
 		log.Fatal("cannot connect to db: ", err)
 	}
 
-	runDBMigrate(conf.Postgres.Migration.MigrateUrl, conf.Postgres.Source)
+	runDBMigrate(conf.Postgres.MigrateUrl, conf.Postgres.Source)
 
 	store := db.NewStore(conn)
 	go runGatewayServer(conf, store)

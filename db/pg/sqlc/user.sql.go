@@ -108,7 +108,7 @@ func (q *Queries) LoginUser(ctx context.Context, arg LoginUserParams) (User, err
 	return i, err
 }
 
-const updateUser = `-- name: UpdateUser :exec
+const updateUser = `-- name: UpdateUser :one
 UPDATE users
 SET
     email = COALESCE($1, email),
@@ -118,6 +118,7 @@ SET
     avatar = COALESCE($5, avatar)
 WHERE
     username = $6
+RETURNING id, username, email, nickname, password, gender, avatar, register_time
 `
 
 type UpdateUserParams struct {
@@ -129,8 +130,8 @@ type UpdateUserParams struct {
 	Username string         `json:"username"`
 }
 
-func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
-	_, err := q.db.ExecContext(ctx, updateUser,
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUser,
 		arg.Email,
 		arg.Nickname,
 		arg.Password,
@@ -138,5 +139,16 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
 		arg.Avatar,
 		arg.Username,
 	)
-	return err
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.Nickname,
+		&i.Password,
+		&i.Gender,
+		&i.Avatar,
+		&i.RegisterTime,
+	)
+	return i, err
 }

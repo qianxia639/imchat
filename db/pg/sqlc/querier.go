@@ -13,7 +13,7 @@ type Querier interface {
 	DeleteUser(ctx context.Context, id int64) error
 	GetUser(ctx context.Context, username string) (User, error)
 	LoginUser(ctx context.Context, arg LoginUserParams) (User, error)
-	UpdateUser(ctx context.Context, arg UpdateUserParams) error
+	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
 }
 
 var _ Querier = (*Queries)(nil)

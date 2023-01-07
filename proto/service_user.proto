@@ -58,7 +58,7 @@ service User {
 
     rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse) {
         option (google.api.http) = {
-            delete: "/v1/user"
+            delete: "/v1/user/{id}"
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
 			description: "Use this API to update user";

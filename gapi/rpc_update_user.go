@@ -30,12 +30,13 @@ func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 	}
 
 	arg := db.UpdateUserParams{
+		Username: req.GetUsername(),
 		Email: sql.NullString{
 			String: req.GetEmail(),
 			Valid:  req.Email != nil,
 		},
 		Nickname: sql.NullString{
-			String: req.GetEmail(),
+			String: req.GetNickname(),
 			Valid:  req.Nickname != nil,
 		},
 		Gender: sql.NullInt16{
@@ -59,8 +60,11 @@ func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 		}
 	}
 
-	err = server.store.UpdateUser(ctx, arg)
+	_, err = server.store.UpdateUser(ctx, arg)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, status.Errorf(codes.NotFound, "user not found: %s", err)
+		}
 		return nil, status.Errorf(codes.Internal, "failed update user: %s", err)
 	}
 

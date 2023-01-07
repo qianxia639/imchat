@@ -136,7 +136,7 @@ func TestUpdateUserOnlyEmail(t *testing.T) {
 	oldUser := createRandomUser(t)
 
 	newEmail := utils.RandomEmail()
-	err := testQueries.UpdateUser(context.Background(), UpdateUserParams{
+	user, err := testQueries.UpdateUser(context.Background(), UpdateUserParams{
 		Username: oldUser.Username,
 		Email: sql.NullString{
 			String: newEmail,
@@ -144,13 +144,18 @@ func TestUpdateUserOnlyEmail(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
+	require.NotEmpty(t, user)
+
+	require.NotEqual(t, oldUser.Email, user.Email)
+	require.Equal(t, newEmail, user.Email)
+	require.Equal(t, oldUser.Username, user.Username)
 }
 
 func TestUpdateUserOnlyNickname(t *testing.T) {
 	oldUser := createRandomUser(t)
 
 	newNickname := utils.RandomEmail()
-	err := testQueries.UpdateUser(context.Background(), UpdateUserParams{
+	user, err := testQueries.UpdateUser(context.Background(), UpdateUserParams{
 		Username: oldUser.Username,
 		Nickname: sql.NullString{
 			String: newNickname,
@@ -158,6 +163,14 @@ func TestUpdateUserOnlyNickname(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
+	require.NotEmpty(t, user)
+
+	require.NotEqual(t, oldUser.Nickname, user.Nickname)
+	require.Equal(t, newNickname, user.Nickname)
+	require.Equal(t, oldUser.Username, user.Username)
+	require.Equal(t, oldUser.Password, user.Password)
+	require.Equal(t, oldUser.Gender, user.Gender)
+	require.Equal(t, oldUser.Avatar, user.Avatar)
 }
 
 func TestUpdateUserOnlyPassword(t *testing.T) {
@@ -167,7 +180,7 @@ func TestUpdateUserOnlyPassword(t *testing.T) {
 	newHashPassword, err := utils.HashPassword(newPassword)
 	require.NoError(t, err)
 
-	err = testQueries.UpdateUser(context.Background(), UpdateUserParams{
+	_, err = testQueries.UpdateUser(context.Background(), UpdateUserParams{
 		Username: oldUser.Username,
 		Password: sql.NullString{
 			String: newHashPassword,
@@ -181,7 +194,7 @@ func TestUpdateUserOnlyGender(t *testing.T) {
 	oldUser := createRandomUser(t)
 
 	newGender := utils.RandomGender()
-	err := testQueries.UpdateUser(context.Background(), UpdateUserParams{
+	_, err := testQueries.UpdateUser(context.Background(), UpdateUserParams{
 		Username: oldUser.Username,
 		Gender: sql.NullInt16{
 			Int16: int16(newGender),
@@ -195,7 +208,7 @@ func TestUpdateUserOnlyAvatar(t *testing.T) {
 	oldUser := createRandomUser(t)
 
 	newAvatar := "https://ns-strategy.cdn.bcebos.com/ns-strategy/upload/fc_big_pic/part-00544-3205.jpg"
-	err := testQueries.UpdateUser(context.Background(), UpdateUserParams{
+	_, err := testQueries.UpdateUser(context.Background(), UpdateUserParams{
 		Username: oldUser.Username,
 		Avatar: sql.NullString{
 			String: newAvatar,
@@ -210,13 +223,13 @@ func TestUpdateUserAllFields(t *testing.T) {
 
 	newEmail := utils.RandomEmail()
 	newNickname := utils.RandomString(6)
-	newGendder := utils.RandomGender()
+	newGender := int16(utils.RandomGender())
 	newPassword := utils.RandomString(6)
 	newHashPassword, err := utils.HashPassword(newPassword)
 	require.NoError(t, err)
 
 	newAvatar := "https://ns-strategy.cdn.bcebos.com/ns-strategy/upload/fc_big_pic/part-00544-3215.jpg"
-	err = testQueries.UpdateUser(context.Background(), UpdateUserParams{
+	user, err := testQueries.UpdateUser(context.Background(), UpdateUserParams{
 		Username: oldUser.Username,
 		Email: sql.NullString{
 			String: newEmail,
@@ -231,7 +244,7 @@ func TestUpdateUserAllFields(t *testing.T) {
 			Valid:  true,
 		},
 		Gender: sql.NullInt16{
-			Int16: int16(newGendder),
+			Int16: int16(newGender),
 			Valid: true,
 		},
 		Avatar: sql.NullString{
@@ -241,13 +254,11 @@ func TestUpdateUserAllFields(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	user, err := testQueries.GetUser(context.Background(), oldUser.Username)
-	require.NoError(t, err)
-	require.NotEmpty(t, user)
-
-	err = utils.CheckPassword(newPassword, user.Password)
-	require.NoError(t, err)
+	require.Equal(t, newEmail, user.Email)
+	require.Equal(t, newNickname, user.Nickname)
 	require.Equal(t, newHashPassword, user.Password)
+	require.Equal(t, newGender, user.Gender)
+	require.Equal(t, newAvatar, user.Avatar)
 }
 
 func TestDeleteUser(t *testing.T) {

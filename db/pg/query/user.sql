@@ -16,7 +16,7 @@ SELECT * FROM users
 WHERE (username = $1 AND password = $2)
 OR (email = $1 AND password = $2) LIMIT 1;
 
--- name: UpdateUser :exec
+-- name: UpdateUser :one
 UPDATE users
 SET
     email = COALESCE(sqlc.narg(email), email),
@@ -25,7 +25,8 @@ SET
     gender = COALESCE(sqlc.narg(gender), gender),
     avatar = COALESCE(sqlc.narg(avatar), avatar)
 WHERE
-    username = sqlc.arg(username);
+    username = sqlc.arg(username)
+RETURNING *;
 
 -- name: DeleteUser :exec
 DELETE FROM users
