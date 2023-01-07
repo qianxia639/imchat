@@ -66,5 +66,6 @@ func TestDeleteUser(t *testing.T) {
 	})
 
 	require.NoError(t, err)
+
 	require.Empty(t, resp2)
 }
