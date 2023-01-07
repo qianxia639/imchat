@@ -20,7 +20,7 @@ jobs:
       # 用于访问服务容器的标签
       postgres:
         # Docker 镜像
-        image: postgres:14
+        image: postgres:14-alpine
         # 环境变量
         env:
           POSTGRES_PASSWORD: root

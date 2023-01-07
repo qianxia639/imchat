@@ -28,8 +28,6 @@ sqlc:
 test:
 	go test -v -cover ./...
 
-mock:
-	mockgen -source=db/pg/sqlc/querier.go -destination=db/pg/mock/user_mock.go -package=mock
 
 proto:
 # rm -f pb/*.go
@@ -40,4 +38,4 @@ proto:
 evans:
 	evans --host localhost --port 9090 -r repl
 
-.PHONY: server postgres createdb migrateup migrateup1 migratedown migratedown1 sqlc test mock proto evans
+.PHONY: server postgres createdb migrateup migrateup1 migratedown migratedown1 sqlc test proto evans
