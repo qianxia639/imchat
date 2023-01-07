@@ -32,12 +32,12 @@ func (server *Server) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest)
 	}
 
 	if user.ID != req.GetId() {
-		return nil, status.Errorf(codes.PermissionDenied, "cannot delete user info: ", err)
+		return nil, status.Errorf(codes.PermissionDenied, "cannot delete user info: %s", err)
 	}
 
 	err = server.store.DeleteUser(ctx, req.GetId())
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "faild delete user: ", err)
+		return nil, status.Errorf(codes.Internal, "faild delete user: %s", err)
 	}
 
 	return &pb.DeleteUserResponse{}, nil

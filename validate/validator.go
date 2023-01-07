@@ -42,18 +42,23 @@ func ValidateEmail(value string) error {
 }
 
 func ValidateGender(value int32) error {
-	genders := []int32{1, 2, 3}
-	for i := range genders {
-		if value == genders[i] {
-			return nil
+	var genders = map[int32]int{
+		1: 1,
+		2: 2,
+		3: 3,
+	}
+	for range genders {
+		if _, ok := genders[value]; !ok {
+			return fmt.Errorf("非法的数据")
 		}
 	}
-	return fmt.Errorf("非法的数据")
+	return nil
 }
 
 func NotEmpty(value string) error {
-	if "" == value {
+	if value == "" {
 		return fmt.Errorf("not empty")
 	}
 	return nil
+
 }
