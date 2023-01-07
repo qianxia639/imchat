@@ -15,5 +15,5 @@ message CreateUserRequest {
 }
 
 message CreateUserResponse {
-    Users user = 1;
+    string message = 1;
 }

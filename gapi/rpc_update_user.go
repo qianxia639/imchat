@@ -68,7 +68,11 @@ func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 		return nil, status.Errorf(codes.Internal, "failed update user: %s", err)
 	}
 
-	return &pb.UpdateUserResponse{}, nil
+	resp := &pb.UpdateUserResponse{
+		Message: "Update User Successfully",
+	}
+
+	return resp, nil
 }
 
 func validateUpdateUserRequest(req *pb.UpdateUserRequest) (violation []*errdetails.BadRequest_FieldViolation) {

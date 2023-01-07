@@ -40,7 +40,11 @@ func (server *Server) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest)
 		return nil, status.Errorf(codes.Internal, "faild delete user: %s", err)
 	}
 
-	return &pb.DeleteUserResponse{}, nil
+	resp := &pb.DeleteUserResponse{
+		Message: "Delete User Successfully",
+	}
+
+	return resp, nil
 }
 
 func validateDeleteUserRequest(req *pb.DeleteUserRequest) (violation []*errdetails.BadRequest_FieldViolation) {

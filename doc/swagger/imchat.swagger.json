@@ -179,13 +179,18 @@
     "pbCreateUserResponse": {
       "type": "object",
       "properties": {
-        "user": {
-          "$ref": "#/definitions/pbUsers"
+        "message": {
+          "type": "string"
         }
       }
     },
     "pbDeleteUserResponse": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
     },
     "pbLoginUserRequest": {
       "type": "object",
@@ -232,30 +237,9 @@
     },
     "pbUpdateUserResponse": {
       "type": "object",
-      "title": "Users user = 1;"
-    },
-    "pbUsers": {
-      "type": "object",
       "properties": {
-        "username": {
+        "message": {
           "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "nickname": {
-          "type": "string"
-        },
-        "gender": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "avatar": {
-          "type": "string"
-        },
-        "registerTime": {
-          "type": "string",
-          "format": "date-time"
         }
       }
     },

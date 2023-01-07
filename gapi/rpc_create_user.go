@@ -32,7 +32,7 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		Gender:   int16(req.GetGender()),
 	}
 
-	user, err := server.store.CreateUser(ctx, arg)
+	_, err = server.store.CreateUser(ctx, arg)
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
 			switch pqErr.Code.Name() {
@@ -44,7 +44,7 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 	}
 
 	rsp := &pb.CreateUserResponse{
-		User: converUser(user),
+		Message: "Create User Successfully",
 	}
 
 	return rsp, nil

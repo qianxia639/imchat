@@ -8,4 +8,6 @@ message DeleteUserRequest {
     int64 id = 1;
 }
 
-message DeleteUserResponse { }
+message DeleteUserResponse { 
+    string message = 1;
+}
