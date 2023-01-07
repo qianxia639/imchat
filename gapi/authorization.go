@@ -4,6 +4,7 @@ import (
 	"IMChat/token"
 	"context"
 	"fmt"
+	"log"
 
 	"google.golang.org/grpc/metadata"
 )
@@ -14,6 +15,7 @@ const (
 
 func (server *Server) authorization(ctx context.Context) (*token.Payload, error) {
 	md, ok := metadata.FromOutgoingContext(ctx)
+	log.Printf("metadata: %v\n", md)
 	if !ok {
 		return nil, fmt.Errorf("missing metadata")
 	}

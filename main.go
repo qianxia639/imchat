@@ -7,6 +7,8 @@ import (
 	"IMChat/utils/config"
 	"context"
 	"database/sql"
+	"embed"
+	"io/fs"
 	"log"
 	"net"
 	"net/http"
@@ -17,9 +19,13 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/protobuf/encoding/protojson"
 
 	_ "github.com/lib/pq"
 )
+
+//go:embed doc/swagger/*
+var embedFs embed.FS
 
 func main() {
 	conf, err := config.LoadConfig(".")
@@ -79,7 +85,17 @@ func runGatewayServer(conf config.Config, store db.Store) {
 		log.Fatal("cannot create server: ", err)
 	}
 
-	grpcMux := runtime.NewServeMux()
+	grpcMux := runtime.NewServeMux(
+		// 下划线命明
+		runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
+			MarshalOptions: protojson.MarshalOptions{
+				UseProtoNames: true,
+			},
+			UnmarshalOptions: protojson.UnmarshalOptions{
+				DiscardUnknown: true,
+			},
+		}),
+	)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -91,6 +107,9 @@ func runGatewayServer(conf config.Config, store db.Store) {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", grpcMux)
+
+	staticFile, _ := fs.Sub(embedFs, "doc/swagger")
+	mux.Handle("/swagger/", http.StripPrefix("/swagger/", http.FileServer(http.FS(staticFile))))
 
 	listener, err := net.Listen("tcp", conf.Server.HttpServerAddress)
 	if err != nil {
