@@ -11,6 +11,9 @@
   "tags": [
     {
       "name": "User"
+    },
+    {
+      "name": "Message"
     }
   ],
   "consumes": [
@@ -207,6 +210,14 @@
       "type": "object",
       "properties": {
         "token": {
+          "type": "string"
+        }
+      }
+    },
+    "pbSendMessageResponse": {
+      "type": "object",
+      "properties": {
+        "msg": {
           "type": "string"
         }
       }
