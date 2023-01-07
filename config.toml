@@ -7,6 +7,7 @@ source = "postgresql://root:root@localhost:5432/imchat?sslmode=disable"
 
 [server]
 grpc_server_address = "0.0.0.0:9090"
+http_server_address = "0.0.0.0:9091"
 
 [token]
 token_symmetric_key = "plokmnjiuhbvgytfcxdreszawq564738"

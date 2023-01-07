@@ -12,6 +12,7 @@ type Config struct {
 	}
 	Server struct {
 		GrpcServerAddress string `mapstructure:"grpc_server_address"`
+		HttpServerAddress string `mapstructure:"http_server_address"`
 	}
 	Token struct {
 		TokenSymmetricKey   string        `mapstructure:"token_symmetric_key"`
