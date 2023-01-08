@@ -8,6 +8,19 @@ import (
 	"time"
 )
 
+type Contact struct {
+	// 主键Id
+	ID int64 `json:"id"`
+	// 谁的关系
+	OwnerID int64 `json:"owner_id"`
+	// 对应的谁
+	TargetID int64 `json:"target_id"`
+	// 对应类型, 1: 好友, 2: 群组
+	Type int16 `json:"type"`
+	// 创建时间
+	CreatedAt time.Time `json:"created_at"`
+}
+
 type User struct {
 	// 主键Id
 	ID int64 `json:"id"`
