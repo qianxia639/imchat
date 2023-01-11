@@ -21,6 +21,15 @@ type Contact struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type Examine struct {
+	// 属主Id
+	OwnerID int64 `json:"owner_id"`
+	// 对应的Id(用户Id或群组Id)
+	TargetID int64 `json:"target_id"`
+	// 创建时间
+	CreatedAt time.Time `json:"created_at"`
+}
+
 type User struct {
 	// 主键Id
 	ID int64 `json:"id"`

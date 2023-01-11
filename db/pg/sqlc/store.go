@@ -8,6 +8,7 @@ import (
 
 type Store interface {
 	Querier
+	AddContactTx(ctx context.Context, arg AddContactTxParams) (AddContactxResult, error)
 }
 
 type SQLStore struct {
