@@ -10,8 +10,11 @@ import (
 
 type Querier interface {
 	AddContact(ctx context.Context, arg AddContactParams) (Contact, error)
+	AddExamine(ctx context.Context, arg AddExamineParams) (Examine, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	DeleteExamine(ctx context.Context, ownerID int64) error
 	DeleteUser(ctx context.Context, id int64) error
+	GetExamine(ctx context.Context, ownerID int64) ([]Examine, error)
 	GetUser(ctx context.Context, username string) (User, error)
 	LoginUser(ctx context.Context, arg LoginUserParams) (User, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)

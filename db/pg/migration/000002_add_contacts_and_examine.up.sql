@@ -9,7 +9,7 @@ CREATE TABLE "contact" (
 CREATE TABLE "examine" (
   "owner_id" bigint NOT NULL,
   "target_id" bigint NOT NULL,
-  "created_at" timestamp NOT NULL DEFAULT '0001-01-01 00:00:00'
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
 
