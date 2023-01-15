@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package="IMChat/pb";
+
+import "rpc_add_contact.proto";
+
+service Contact {
+
+    rpc AddContact (AddContactRequest) returns (AddContactResponse);
+}

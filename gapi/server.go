@@ -5,16 +5,15 @@ import (
 	"IMChat/pb"
 	"IMChat/token"
 	"IMChat/utils/config"
-	ws "IMChat/websocket"
 )
 
 type Server struct {
 	pb.UnimplementedUserServer
 	pb.UnimplementedMessageServer
-	store         db.Store
-	tokenMaker    token.Maker
-	conf          config.Config
-	ClientManager *ws.ClientManager
+	pb.UnimplementedContactServer
+	store      db.Store
+	tokenMaker token.Maker
+	conf       config.Config
 }
 
 func NewServer(conf config.Config, store db.Store) (*Server, error) {
@@ -25,10 +24,9 @@ func NewServer(conf config.Config, store db.Store) (*Server, error) {
 	}
 
 	server := &Server{
-		store:         store,
-		tokenMaker:    tokenMaker,
-		conf:          conf,
-		ClientManager: ws.NewClientManager(),
+		store:      store,
+		tokenMaker: tokenMaker,
+		conf:       conf,
 	}
 
 	return server, nil

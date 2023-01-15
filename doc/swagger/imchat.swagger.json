@@ -13,6 +13,9 @@
       "name": "Message"
     },
     {
+      "name": "Contact"
+    },
+    {
       "name": "User"
     }
   ],
@@ -200,6 +203,14 @@
     }
   },
   "definitions": {
+    "pbAddContactResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
+    },
     "pbCreateUserRequest": {
       "type": "object",
       "properties": {

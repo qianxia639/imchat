@@ -11,4 +11,5 @@ SELECT * FROM examine
 WHERE owner_id = $1;
 
 -- name: DeleteExamine :exec
-DELETE FROM examine WHERE owner_id = $1;
+DELETE FROM examine 
+WHERE owner_id = $1 AND target_id = $2 AND type = $3;

@@ -70,8 +70,6 @@ func runGrpcServer(conf config.Config, store db.Store) {
 	pb.RegisterMessageServer(grpcServer, server)
 	reflection.Register(grpcServer)
 
-	go server.ClientManager.Run()
-
 	listener, err := net.Listen("tcp", conf.Server.GrpcServerAddress)
 	if err != nil {
 		log.Fatal("cannot create listener: ", err)
