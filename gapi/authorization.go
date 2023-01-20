@@ -26,7 +26,11 @@ func (server *Server) authorization(ctx context.Context) (*token.Payload, error)
 	accessToken := values[0]
 	payload, err := server.tokenMaker.VerifyToken(accessToken)
 	if err != nil {
-		return nil, fmt.Errorf("无效的token: %s", err)
+		return nil, fmt.Errorf("invalid token: %s", err)
 	}
+
+	// if time.Now().Sub(payload.ExpiredAt) < 5 {
+	// }
+
 	return payload, nil
 }
