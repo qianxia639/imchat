@@ -31,13 +31,6 @@ func RandomString(n int) string {
 	return sb.String()
 }
 
-// Randomggender 生成随机的性别
-func RandomGender() int {
-	currencies := []int{1, 2, 3}
-	n := len(currencies)
-	return currencies[rand.Intn(n)]
-}
-
 // RandomEmail 生产随机的Email
 func RandomEmail() string {
 	return fmt.Sprintf("%s@email.com", RandomString(6))

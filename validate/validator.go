@@ -3,11 +3,12 @@ package validate
 import (
 	"fmt"
 	"net/mail"
+	"reflect"
 	"regexp"
 )
 
 var (
-	isValidateUsername = regexp.MustCompile(`^[0-9a-zA-Z_]+$`).MatchString
+	isValidateUsername = regexp.MustCompile(`^[0-9a-zA-Z_]{4,20}$`).MatchString
 	// isValidateNickname = regexp.MustCompile(`^[0-9a-zA-Z_?!\\s]+$`).MatchString
 )
 
@@ -20,12 +21,8 @@ func ValidateLen(value string, min, max int) error {
 }
 
 func ValidateUsername(value string) error {
-	if err := ValidateLen(value, 3, 30); err != nil {
-		return err
-	}
-
 	if !isValidateUsername(value) {
-		return fmt.Errorf("只能包含 字母、数字或下划线")
+		return fmt.Errorf("只能包含 字母、数字或下划线,且字符长度在4-20之间")
 	}
 	return nil
 }
@@ -55,10 +52,22 @@ func ValidateGender(value int32) error {
 	return nil
 }
 
-func NotEmpty(value string) error {
-	if value == "" {
-		return fmt.Errorf("not empty")
-	}
-	return nil
+func IsEmpty(value any) bool {
+	v := reflect.ValueOf(value)
 
+	switch v.Kind() {
+	case reflect.String, reflect.Array, reflect.Slice, reflect.Map:
+		return v.Len() == 0
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return v.Int() == 0
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return v.Uint() == 0
+	case reflect.Float32, reflect.Float64:
+		return v.Float() == 0
+	case reflect.Bool:
+		return !v.Bool()
+	case reflect.Interface, reflect.Ptr:
+		return v.IsNil()
+	}
+	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 }

@@ -7,6 +7,7 @@ import (
 	"IMChat/validate"
 	"context"
 	"database/sql"
+	"fmt"
 
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
@@ -50,15 +51,13 @@ func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 		Token: token,
 	}
 
-	//pb.Login
-
 	return resp, nil
 }
 
 func validateLoginUserRequest(req *pb.LoginUserRequest) (violation []*errdetails.BadRequest_FieldViolation) {
 
-	if err := validate.NotEmpty(req.GetUsername()); err != nil {
-		violation = append(violation, fieldViolation("username", err))
+	if ok := validate.IsEmpty(req.GetUsername()); ok {
+		violation = append(violation, fieldViolation("username", fmt.Errorf("cannot empty")))
 	}
 
 	if err := validate.ValidateLen(req.GetPassword(), 3, 20); err != nil {

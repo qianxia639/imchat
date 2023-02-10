@@ -112,7 +112,10 @@ func runGatewayServer(conf config.Config, store db.Store) {
 	mux := http.NewServeMux()
 	mux.Handle("/", grpcMux)
 
-	staticFile, _ := fs.Sub(embedFs, "doc/swagger")
+	staticFile, err := fs.Sub(embedFs, "doc/swagger")
+	if err != nil {
+		log.Fatal("fs error: ", err)
+	}
 	mux.Handle("/swagger/", http.StripPrefix("/swagger/", http.FileServer(http.FS(staticFile))))
 
 	listener, err := net.Listen("tcp", conf.Server.HttpServerAddress)

@@ -41,8 +41,7 @@ func (server *Server) AddContact(ctx context.Context, req *pb.AddContactRequest)
 					Type:     int16(req.GetType()),
 				},
 				AfterCreate: func(contact db.Contact) error {
-					return server.store.
-						DeleteExamine(context.Background(), contact.TargetID)
+					return server.store.DeleteExamine(context.Background(), contact.TargetID)
 				},
 			})
 			return err

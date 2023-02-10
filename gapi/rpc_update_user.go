@@ -7,6 +7,7 @@ import (
 	"IMChat/validate"
 	"context"
 	"database/sql"
+	"fmt"
 
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
@@ -106,8 +107,8 @@ func validateUpdateUserRequest(req *pb.UpdateUserRequest) (violation []*errdetai
 	}
 
 	if req.Avatar != nil {
-		if err := validate.NotEmpty(req.GetAvatar()); err != nil {
-			violation = append(violation, fieldViolation("avatar", err))
+		if ok := validate.IsEmpty(req.GetAvatar()); ok {
+			violation = append(violation, fieldViolation("avatar", fmt.Errorf("cannot empty")))
 		}
 	}
 

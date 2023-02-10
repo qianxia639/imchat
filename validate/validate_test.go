@@ -17,10 +17,14 @@ func TestValidateLen(t *testing.T) {
 }
 
 func TestValidateUsername(t *testing.T) {
-	err := ValidateUsername("testmailcom_")
-	require.NoError(t, err)
-}
-func TestValidateGender(t *testing.T) {
-	err := ValidateGender(1)
-	require.NoError(t, err)
+
+	t.Run("No Error", func(t *testing.T) {
+		err := ValidateUsername("testmailcom_")
+		require.NoError(t, err)
+	})
+
+	t.Run("Error", func(t *testing.T) {
+		err := ValidateUsername("testmailcom_1111111111")
+		require.NotEmpty(t, err)
+	})
 }

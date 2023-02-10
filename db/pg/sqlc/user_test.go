@@ -21,7 +21,7 @@ func createRandomUser(t *testing.T) User {
 		Email:    utils.RandomEmail(),
 		Nickname: name,
 		Password: hashPwd,
-		// Gender:   int16(utils.RandomGender()),
+		Gender:   3,
 	}
 
 	user, err := testQueries.CreateUser(context.Background(), arg)
@@ -90,11 +90,11 @@ func TestLoginUser(t *testing.T) {
 
 	testCase := []struct {
 		name string
-		Func func(*Queries) (User, error)
+		fn   func(*Queries) (User, error)
 	}{
 		{
 			name: "AND Password",
-			Func: func(q *Queries) (User, error) {
+			fn: func(q *Queries) (User, error) {
 				return q.LoginUser(context.Background(), LoginUserParams{
 					Username: user1.Username,
 					Password: user1.Password,
@@ -103,7 +103,7 @@ func TestLoginUser(t *testing.T) {
 		},
 		{
 			name: "Email AND Password",
-			Func: func(q *Queries) (User, error) {
+			fn: func(q *Queries) (User, error) {
 				return q.LoginUser(context.Background(), LoginUserParams{
 					Username: user1.Email,
 					Password: user1.Password,
@@ -115,7 +115,7 @@ func TestLoginUser(t *testing.T) {
 	for i := range testCase {
 		tc := testCase[i]
 		t.Run(tc.name, func(t *testing.T) {
-			user2, err := tc.Func(testQueries)
+			user2, err := tc.fn(testQueries)
 			require.NoError(t, err)
 			require.NotEmpty(t, user2)
 
@@ -193,7 +193,7 @@ func TestUpdateUserOnlyPassword(t *testing.T) {
 func TestUpdateUserOnlyGender(t *testing.T) {
 	oldUser := createRandomUser(t)
 
-	newGender := utils.RandomGender()
+	newGender := 1
 	_, err := testQueries.UpdateUser(context.Background(), UpdateUserParams{
 		Username: oldUser.Username,
 		Gender: sql.NullInt16{
@@ -223,7 +223,7 @@ func TestUpdateUserAllFields(t *testing.T) {
 
 	newEmail := utils.RandomEmail()
 	newNickname := utils.RandomString(6)
-	newGender := int16(utils.RandomGender())
+	newGender := 1
 	newPassword := utils.RandomString(6)
 	newHashPassword, err := utils.HashPassword(newPassword)
 	require.NoError(t, err)
