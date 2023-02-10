@@ -1,6 +1,6 @@
 [postgres]
 driver = "postgres"
-source = "postgresql://root:root@localhost:5432/imchat?sslmode=disable?TimeZone=Asiz/Shanghai"
+source = "postgresql://root:root@192.168.172.132:5432/imchat?sslmode=disable"
 migrate_url = "file://db/pg/migration"
 
 [server]

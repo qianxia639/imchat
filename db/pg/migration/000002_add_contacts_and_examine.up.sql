@@ -9,6 +9,7 @@ CREATE TABLE "contact" (
 CREATE TABLE "examine" (
   "owner_id" bigint NOT NULL,
   "target_id" bigint NOT NULL,
+  "type" smallint NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
@@ -36,6 +37,8 @@ CREATE INDEX ON "examine" ("target_id");
 COMMENT ON COLUMN "examine"."owner_id" IS '属主Id';
 
 COMMENT ON COLUMN "examine"."target_id" IS '对应的Id(用户Id或群组Id)';
+
+COMMENT ON COLUMN "examine"."type" IS '类型';
 
 COMMENT ON COLUMN "examine"."created_at" IS '创建时间';
 

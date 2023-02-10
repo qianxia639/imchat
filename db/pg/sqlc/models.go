@@ -26,6 +26,8 @@ type Examine struct {
 	OwnerID int64 `json:"owner_id"`
 	// 对应的Id(用户Id或群组Id)
 	TargetID int64 `json:"target_id"`
+	// 类型
+	Type int16 `json:"type"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at"`
 }

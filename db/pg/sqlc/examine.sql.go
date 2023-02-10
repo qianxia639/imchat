@@ -11,36 +11,49 @@ import (
 
 const addExamine = `-- name: AddExamine :one
 INSERT INTO examine (
-    owner_id, target_id
+    owner_id, target_id, type
 ) VALUES (
-    $1, $2
+    $1, $2, $3
 )
-RETURNING owner_id, target_id, created_at
+RETURNING owner_id, target_id, type, created_at
 `
 
 type AddExamineParams struct {
 	OwnerID  int64 `json:"owner_id"`
 	TargetID int64 `json:"target_id"`
+	Type     int16 `json:"type"`
 }
 
 func (q *Queries) AddExamine(ctx context.Context, arg AddExamineParams) (Examine, error) {
-	row := q.db.QueryRowContext(ctx, addExamine, arg.OwnerID, arg.TargetID)
+	row := q.db.QueryRowContext(ctx, addExamine, arg.OwnerID, arg.TargetID, arg.Type)
 	var i Examine
-	err := row.Scan(&i.OwnerID, &i.TargetID, &i.CreatedAt)
+	err := row.Scan(
+		&i.OwnerID,
+		&i.TargetID,
+		&i.Type,
+		&i.CreatedAt,
+	)
 	return i, err
 }
 
 const deleteExamine = `-- name: DeleteExamine :exec
-DELETE FROM examine WHERE owner_id = $1
+DELETE FROM examine 
+WHERE owner_id = $1 AND target_id = $2 AND type = $3
 `
 
-func (q *Queries) DeleteExamine(ctx context.Context, ownerID int64) error {
-	_, err := q.db.ExecContext(ctx, deleteExamine, ownerID)
+type DeleteExamineParams struct {
+	OwnerID  int64 `json:"owner_id"`
+	TargetID int64 `json:"target_id"`
+	Type     int16 `json:"type"`
+}
+
+func (q *Queries) DeleteExamine(ctx context.Context, arg DeleteExamineParams) error {
+	_, err := q.db.ExecContext(ctx, deleteExamine, arg.OwnerID, arg.TargetID, arg.Type)
 	return err
 }
 
 const getExamine = `-- name: GetExamine :many
-SELECT owner_id, target_id, created_at FROM examine
+SELECT owner_id, target_id, type, created_at FROM examine
 WHERE owner_id = $1
 `
 
@@ -53,7 +66,12 @@ func (q *Queries) GetExamine(ctx context.Context, ownerID int64) ([]Examine, err
 	items := []Examine{}
 	for rows.Next() {
 		var i Examine
-		if err := rows.Scan(&i.OwnerID, &i.TargetID, &i.CreatedAt); err != nil {
+		if err := rows.Scan(
+			&i.OwnerID,
+			&i.TargetID,
+			&i.Type,
+			&i.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

@@ -1,8 +1,8 @@
 -- name: AddExamine :one
 INSERT INTO examine (
-    owner_id, target_id
+    owner_id, target_id, type
 ) VALUES (
-    $1, $2
+    $1, $2, $3
 )
 RETURNING *;
 
