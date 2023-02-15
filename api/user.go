@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
@@ -62,6 +63,11 @@ type loginUserRequest struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
 
+type loginUserResponse struct {
+	Token string  `json:"token"`
+	User  db.User `jsn:"user"`
+}
+
 func (server *Server) loginUser(ctx *gin.Context) {
 	var req loginUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -91,7 +97,25 @@ func (server *Server) loginUser(ctx *gin.Context) {
 		return
 	}
 
-	ctx.SecureJSON(http.StatusOK, token)
+	key := fmt.Sprintf("useer:%d_%s", user.ID, user.Username)
+	err = server.cache.SetTtlCache(ctx, key, &user, 24*time.Hour)
+	if err != nil {
+		ctx.SecureJSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	resp := loginUserResponse{
+		Token: token,
+		User: db.User{
+			ID:       user.ID,
+			Username: user.Username,
+			Nickname: user.Nickname,
+			Gender:   user.Gender,
+			Avatar:   user.Avatar,
+		},
+	}
+
+	ctx.SecureJSON(http.StatusOK, resp)
 }
 
 type UpdateUserRequeest struct {
@@ -107,6 +131,17 @@ func (server *Server) updateUser(ctx *gin.Context) {
 	var req UpdateUserRequeest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.SecureJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	token := ctx.GetHeader(authorizationHeader)
+	payload, err := server.tokenMaker.VerifyToken(token)
+	if err != nil {
+		ctx.SecureJSON(http.StatusUnauthorized, err.Error())
+		return
+	}
+	if req.Username != payload.Username {
+		ctx.SecureJSON(http.StatusBadRequest, "用户名错误")
 		return
 	}
 
@@ -154,11 +189,14 @@ func (server *Server) updateUser(ctx *gin.Context) {
 		}
 	}
 
-	_, err := server.store.UpdateUser(ctx, arg)
+	user, err := server.store.UpdateUser(ctx, arg)
 	if err != nil {
 		ctx.SecureJSON(http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	key := fmt.Sprintf("user:%d_%s", user.ID, user.Username)
+	_ = server.cache.SetCache(ctx, key, user)
 
 	ctx.SecureJSON(http.StatusOK, "Update Usere Successfully")
 }

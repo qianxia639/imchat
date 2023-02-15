@@ -5,6 +5,8 @@ import (
 	"IMChat/token"
 	"IMChat/utils/config"
 
+	"IMChat/cache"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
@@ -12,18 +14,20 @@ import (
 
 type Server struct {
 	store      db.Store
+	cache      cache.Cache
 	router     *gin.Engine
 	tokenMaker token.Maker
 	conf       config.Config
 }
 
-func NewServer(conf config.Config, store db.Store) (*Server, error) {
+func NewServer(conf config.Config, store db.Store, cache cache.Cache) (*Server, error) {
 	tokenMaker, err := token.NewPasetoMaker(conf.Token.TokenSymmetricKey)
 	if err != nil {
 		return nil, err
 	}
 	server := &Server{
 		store:      store,
+		cache:      cache,
 		tokenMaker: tokenMaker,
 		conf:       conf,
 	}

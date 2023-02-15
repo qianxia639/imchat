@@ -2,9 +2,11 @@ package main
 
 import (
 	"IMChat/api"
+	"IMChat/cache"
 	db "IMChat/db/pg/sqlc"
 	"IMChat/gapi"
 	"IMChat/pb"
+	"IMChat/utils"
 	"IMChat/utils/config"
 	"context"
 	"database/sql"
@@ -43,9 +45,12 @@ func main() {
 	runDBMigrate(conf.Postgres.MigrateUrl, conf.Postgres.Source)
 
 	store := db.NewStore(conn)
+
+	cache := cache.NewRedisCache(utils.InitRedis(conf))
+
 	// go runGatewayServer(conf, store)
 	// runGrpcServer(conf, store)
-	runGinServer(conf, store)
+	runGinServer(conf, store, cache)
 }
 
 func runDBMigrate(migrationUrl, dbSource string) {
@@ -131,8 +136,8 @@ func runGatewayServer(conf config.Config, store db.Store) {
 	}
 }
 
-func runGinServer(conf config.Config, store db.Store) {
-	server, err := api.NewServer(conf, store)
+func runGinServer(conf config.Config, store db.Store, cache cache.Cache) {
+	server, err := api.NewServer(conf, store, cache)
 	if err != nil {
 		log.Fatal("cannot create server: ", err)
 	}

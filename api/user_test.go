@@ -22,6 +22,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// func setCache(t *testing.T, cache cache.Cache, user db.User) {
+// 	key := fmt.Sprintf("user:%d_%s", user.ID, user.Username)
+// 	err := cache.SetCache(context.Background(), key, user)
+// 	require.NoError(t, err)
+// }
+
 type eqCreateUserParamsMatcher struct {
 	arg      db.CreateUserParams
 	password string
@@ -206,11 +212,13 @@ func TestCreateUser(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
-			recoder := httptest.NewRecorder()
-
 			data, err := json.Marshal(tc.body)
 			require.NoError(t, err)
+
+			cache := newTestRedis(t)
+
+			server := newTestServer(t, store, cache)
+			recoder := httptest.NewRecorder()
 
 			request, err := http.NewRequest(http.MethodPost, "/user", bytes.NewBuffer(data))
 			require.NoError(t, err)
@@ -340,7 +348,9 @@ func TestLoginUser(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			cache := newTestRedis(t)
+
+			server := newTestServer(t, store, cache)
 			recoder := httptest.NewRecorder()
 
 			data, err := json.Marshal(tc.body)
@@ -484,11 +494,13 @@ func TestUpdateUser(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubd(store)
 
+			cache := newTestRedis(t)
+
+			server := newTestServer(t, store, cache)
+			recorder := httptest.NewRecorder()
+
 			data, err := json.Marshal(tc.body)
 			require.NoError(t, err)
-
-			server := newTestServer(t, store)
-			recorder := httptest.NewRecorder()
 
 			url := "/user"
 			request, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(data))

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"IMChat/cache"
 	db "IMChat/db/pg/sqlc"
 	"IMChat/utils"
 	"IMChat/utils/config"
@@ -13,12 +14,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func newTestServer(t *testing.T, store db.Store) *Server {
+func newTestServer(t *testing.T, store db.Store, cache cache.Cache) *Server {
 	conf := config.Config{}
 	conf.Token.TokenSymmetricKey = utils.RandomString(32)
 	conf.Token.AccessTokenDuration = time.Minute
 
-	server, err := NewServer(conf, store)
+	server, err := NewServer(conf, store, cache)
 	require.NoError(t, err)
 
 	return server
@@ -32,6 +33,15 @@ func newTestDb(t *testing.T) db.Store {
 	require.NoError(t, err)
 
 	return db.NewStore(conn)
+}
+
+func newTestRedis(t *testing.T) cache.Cache {
+	conf, err := config.LoadConfig("../.")
+	require.NoError(t, err)
+
+	client := utils.InitRedis(conf)
+
+	return cache.NewRedisCache(client)
 }
 
 func TestMain(m *testing.M) {
