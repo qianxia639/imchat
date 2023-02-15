@@ -223,7 +223,7 @@ func TestUpdateUserAllFields(t *testing.T) {
 
 	newEmail := utils.RandomEmail()
 	newNickname := utils.RandomString(6)
-	newGender := 1
+	var newGender int16 = 1
 	newPassword := utils.RandomString(6)
 	newHashPassword, err := utils.HashPassword(newPassword)
 	require.NoError(t, err)

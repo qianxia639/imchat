@@ -41,7 +41,11 @@ func (server *Server) AddContact(ctx context.Context, req *pb.AddContactRequest)
 					Type:     int16(req.GetType()),
 				},
 				AfterCreate: func(contact db.Contact) error {
-					return server.store.DeleteExamine(context.Background(), contact.TargetID)
+					return server.store.DeleteExamine(context.Background(), db.DeleteExamineParams{
+						TargetID: contact.TargetID,
+						OwnerID:  contact.OwnerID,
+						Type:     contact.Type,
+					})
 				},
 			})
 			return err
@@ -50,7 +54,6 @@ func (server *Server) AddContact(ctx context.Context, req *pb.AddContactRequest)
 	if err != nil {
 		return nil, err
 	}
-	// 艾
 
 	return &pb.AddContactResponse{Message: "Add Friend Success..."}, nil
 }

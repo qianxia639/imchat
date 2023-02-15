@@ -17,11 +17,12 @@ func TestAddContactTx(t *testing.T) {
 	fmt.Printf("user1: %#+v\n", user1)
 	fmt.Printf("user2: %#+v\n", user2)
 
-	var _type int16 = 0
+	var _type int16 = 1
 
 	examine, err := testQueries.AddExamine(context.Background(), AddExamineParams{
 		OwnerID:  user2.ID,
 		TargetID: user1.ID,
+		Type:     _type,
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, examine)
@@ -47,7 +48,11 @@ func TestAddContactTx(t *testing.T) {
 					},
 					AfterCreate: func(contact Contact) error {
 						fmt.Printf("contact: %#+v\n", contact)
-						err := store.DeleteExamine(context.Background(), contact.TargetID)
+						err := store.DeleteExamine(context.Background(), DeleteExamineParams{
+							TargetID: contact.OwnerID,
+							OwnerID:  contact.TargetID,
+							Type:     contact.Type,
+						})
 						require.NoError(t, err)
 						return err
 					},

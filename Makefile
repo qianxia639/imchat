@@ -28,6 +28,8 @@ sqlc:
 test:
 	go test -v -cover ./...
 
+mock:
+	mockgen -package mockdb -destination db/pg/mock/store.go IMChat/db/pg/sqlc Store
 
 proto:
 	rm -f pb/*.go
@@ -41,4 +43,4 @@ proto:
 evans:
 	evans --host localhost --port 9090 -r repl
 
-.PHONY: server postgres createdb migrateup migrateup1 migratedown migratedown1 sqlc test proto evans
+.PHONY: server postgres createdb migrateup migrateup1 migratedown migratedown1 sqlc test mock proto evans

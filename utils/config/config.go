@@ -16,4 +16,9 @@ type Config struct {
 		TokenSymmetricKey   string        `mapstructure:"token_symmetric_key"`
 		AccessTokenDuration time.Duration `mapstructure:"access_token_duration"`
 	}
+	Redis struct {
+		Address  string `mapstructure:"address"`
+		Password string `mapstructure:"password"`
+		DB       int    `mapstructure:"db"`
+	}
 }
