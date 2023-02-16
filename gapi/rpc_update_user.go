@@ -4,7 +4,6 @@ import (
 	db "IMChat/db/pg/sqlc"
 	"IMChat/pb"
 	"IMChat/utils"
-	"IMChat/validate"
 	"context"
 	"database/sql"
 	"fmt"
@@ -78,36 +77,36 @@ func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 
 func validateUpdateUserRequest(req *pb.UpdateUserRequest) (violation []*errdetails.BadRequest_FieldViolation) {
 
-	if err := validate.ValidateUsername(req.GetUsername()); err != nil {
+	if err := utils.ValidateUsername(req.GetUsername()); err != nil {
 		violation = append(violation, fieldViolation("username", err))
 	}
 
 	if req.Email != nil {
-		if err := validate.ValidateEmail(req.GetEmail()); err != nil {
+		if err := utils.ValidateEmail(req.GetEmail()); err != nil {
 			violation = append(violation, fieldViolation("email", err))
 		}
 	}
 
 	if req.Nickname != nil {
-		if err := validate.ValidateUsername(req.GetNickname()); err != nil {
+		if err := utils.ValidateUsername(req.GetNickname()); err != nil {
 			violation = append(violation, fieldViolation("nickname", err))
 		}
 	}
 
 	if req.Password != nil {
-		if err := validate.ValidateLen(req.GetPassword(), 3, 20); err != nil {
+		if err := utils.ValidateLen(req.GetPassword(), 3, 20); err != nil {
 			violation = append(violation, fieldViolation("password", err))
 		}
 	}
 
 	if req.Gender != nil {
-		if err := validate.ValidateGender(req.GetGender()); err != nil {
+		if err := utils.ValidateGender(req.GetGender()); err != nil {
 			violation = append(violation, fieldViolation("gender", err))
 		}
 	}
 
 	if req.Avatar != nil {
-		if ok := validate.IsEmpty(req.GetAvatar()); ok {
+		if ok := utils.IsEmpty(req.GetAvatar()); ok {
 			violation = append(violation, fieldViolation("avatar", fmt.Errorf("cannot empty")))
 		}
 	}

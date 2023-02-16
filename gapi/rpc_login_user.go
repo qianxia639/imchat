@@ -4,7 +4,6 @@ import (
 	db "IMChat/db/pg/sqlc"
 	"IMChat/pb"
 	"IMChat/utils"
-	"IMChat/validate"
 	"context"
 	"database/sql"
 	"fmt"
@@ -56,11 +55,11 @@ func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 
 func validateLoginUserRequest(req *pb.LoginUserRequest) (violation []*errdetails.BadRequest_FieldViolation) {
 
-	if ok := validate.IsEmpty(req.GetUsername()); ok {
+	if ok := utils.IsEmpty(req.GetUsername()); ok {
 		violation = append(violation, fieldViolation("username", fmt.Errorf("cannot empty")))
 	}
 
-	if err := validate.ValidateLen(req.GetPassword(), 3, 20); err != nil {
+	if err := utils.ValidateLen(req.GetPassword(), 3, 20); err != nil {
 		violation = append(violation, fieldViolation("password", err))
 	}
 

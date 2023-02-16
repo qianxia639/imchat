@@ -4,7 +4,6 @@ import (
 	db "IMChat/db/pg/sqlc"
 	"IMChat/pb"
 	"IMChat/utils"
-	"IMChat/validate"
 	"context"
 
 	"github.com/lib/pq"
@@ -51,19 +50,19 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 }
 
 func validateCreateUserRequest(req *pb.CreateUserRequest) (violation []*errdetails.BadRequest_FieldViolation) {
-	if err := validate.ValidateEmail(req.GetEmail()); err != nil {
+	if err := utils.ValidateEmail(req.GetEmail()); err != nil {
 		violation = append(violation, fieldViolation("email", err))
 	}
 
-	if err := validate.ValidateUsername(req.GetUsername()); err != nil {
+	if err := utils.ValidateUsername(req.GetUsername()); err != nil {
 		violation = append(violation, fieldViolation("username", err))
 	}
 
-	if err := validate.ValidateLen(req.GetPassword(), 3, 20); err != nil {
+	if err := utils.ValidateLen(req.GetPassword(), 3, 20); err != nil {
 		violation = append(violation, fieldViolation("password", err))
 	}
 
-	if err := validate.ValidateGender(req.GetGender()); err != nil {
+	if err := utils.ValidateGender(req.GetGender()); err != nil {
 		violation = append(violation, fieldViolation("gender", err))
 	}
 
