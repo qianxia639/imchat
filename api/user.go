@@ -2,10 +2,12 @@ package api
 
 import (
 	db "IMChat/db/pg/sqlc"
+	"IMChat/token"
 	"IMChat/utils"
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -134,12 +136,18 @@ func (server *Server) updateUser(ctx *gin.Context) {
 		return
 	}
 
-	token := ctx.GetHeader(authorizationHeader)
-	payload, err := server.tokenMaker.VerifyToken(token)
-	if err != nil {
-		ctx.SecureJSON(http.StatusUnauthorized, err.Error())
+	val, ok := ctx.Get(authorizationHeader)
+	if !ok {
+		ctx.SecureJSON(http.StatusInternalServerError, "missing key")
 		return
 	}
+
+	payload, ok := val.(*token.Payload)
+	if !ok {
+		ctx.SecureJSON(http.StatusBadRequest, "错误的类型断言")
+		return
+	}
+
 	if req.Username != payload.Username {
 		ctx.SecureJSON(http.StatusBadRequest, "用户名错误")
 		return
@@ -199,4 +207,34 @@ func (server *Server) updateUser(ctx *gin.Context) {
 	_ = server.cache.SetCache(ctx, key, user)
 
 	ctx.SecureJSON(http.StatusOK, "Update Usere Successfully")
+}
+
+func (server *Server) deleteUser(ctx *gin.Context) {
+	id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
+	if err != nil || id <= 0 {
+		ctx.SecureJSON(http.StatusBadRequest, "invalid parameter")
+		return
+	}
+
+	val, ok := ctx.Get(authorizationPayloadKey)
+	if !ok {
+		ctx.SecureJSON(http.StatusInternalServerError, "missing key")
+		return
+	}
+
+	payload, ok := val.(*token.Payload)
+	if !ok {
+		ctx.SecureJSON(http.StatusBadRequest, "错误的类型断言")
+		return
+	}
+
+	user, err := server.store.GetUser(ctx, payload.Username)
+	if err != nil || id != user.ID {
+		ctx.SecureJSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	_ = server.store.DeleteUser(ctx, id)
+
+	ctx.SecureJSON(http.StatusOK, "Delete Usere Successfully")
 }
