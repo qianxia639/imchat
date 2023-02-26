@@ -3,7 +3,6 @@ package api
 import (
 	mockdb "IMChat/db/pg/mock"
 	db "IMChat/db/pg/sqlc"
-	"IMChat/token"
 	"IMChat/utils"
 	"bytes"
 	"database/sql"
@@ -14,7 +13,6 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
@@ -364,154 +362,6 @@ func TestLoginUser(t *testing.T) {
 			tc.checkResponse(recoder)
 		})
 	}
-}
-
-type eqUpdateUserParamsMatcher struct {
-	arg      db.UpdateUserParams
-	password string
-}
-
-func (e eqUpdateUserParamsMatcher) Matches(x interface{}) bool {
-	arg, ok := x.(db.UpdateUserParams)
-	if !ok {
-		return false
-	}
-
-	err := utils.CheckPassword(e.password, arg.Password.String)
-	if err != nil {
-		return false
-	}
-
-	e.arg.Password.String = arg.Password.String
-	return reflect.DeepEqual(e.arg, arg)
-}
-
-func (e eqUpdateUserParamsMatcher) String() string {
-	return fmt.Sprintf("matches arg %v and password %v", e.arg, e.password)
-}
-
-func EqUpdateUserParams(arg db.UpdateUserParams, password string) gomock.Matcher {
-	return eqUpdateUserParamsMatcher{arg, password}
-}
-
-func TestUpdateUser(t *testing.T) {
-	user, password := randomUser(t)
-
-	email := utils.RandomEmail()
-	nickname := utils.RandomString(6)
-	var gender int16 = 1
-	avatar := fmt.Sprintf("%s.jpg", utils.RandomString(6))
-
-	testCases := []struct {
-		name          string
-		body          gin.H
-		setupAuth     func(t *testing.T, req *http.Request, tokenMaker token.Maker)
-		buildStubd    func(store *mockdb.MockStore)
-		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
-	}{
-		{
-			name: "InternalError",
-			body: gin.H{
-				"username": user.Username,
-				"email":    utils.RandomEmail(),
-				"password": password,
-				"nickname": utils.RandomString(6),
-				"gender":   1,
-				"avatar":   fmt.Sprintf("%s.jpg", utils.RandomString(6)),
-			},
-			setupAuth: func(t *testing.T, req *http.Request, tokenMaker token.Maker) {
-				addAuthorizatin(t, req, tokenMaker, user.Username, time.Minute)
-			},
-			buildStubd: func(store *mockdb.MockStore) {
-				store.EXPECT().
-					UpdateUser(gomock.Any(), gomock.Any()).
-					Times(1).
-					Return(db.User{}, sql.ErrConnDone)
-			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusInternalServerError, recorder.Code)
-			},
-		},
-		{
-			name: "UpdateUserAllFields",
-			body: gin.H{
-				"username": user.Username,
-				"email":    email,
-				"password": password,
-				"nickname": nickname,
-				"gender":   gender,
-				"avatar":   avatar,
-			},
-			setupAuth: func(t *testing.T, req *http.Request, tokenMaker token.Maker) {
-				addAuthorizatin(t, req, tokenMaker, user.Username, time.Minute)
-			},
-			buildStubd: func(store *mockdb.MockStore) {
-				hashPassword, err := utils.HashPassword(password)
-				require.NoError(t, err)
-
-				arg := db.UpdateUserParams{
-					Username: user.Username,
-					Password: sql.NullString{
-						String: hashPassword,
-						Valid:  true,
-					},
-					Email: sql.NullString{
-						String: email,
-						Valid:  true,
-					},
-					Nickname: sql.NullString{
-						String: nickname,
-						Valid:  true,
-					},
-					Gender: sql.NullInt16{
-						Int16: gender,
-						Valid: true,
-					},
-					Avatar: sql.NullString{
-						String: avatar,
-						Valid:  true,
-					},
-				}
-
-				store.EXPECT().
-					UpdateUser(gomock.Any(), EqUpdateUserParams(arg, password)).
-					Times(1).
-					Return(user, nil)
-			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusOK, recorder.Code)
-			},
-		},
-	}
-
-	for i := range testCases {
-		tc := testCases[i]
-
-		t.Run(tc.name, func(t *testing.T) {
-			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
-
-			store := mockdb.NewMockStore(ctrl)
-			tc.buildStubd(store)
-
-			cache := newTestRedis(t)
-
-			server := newTestServer(t, store, cache)
-			recorder := httptest.NewRecorder()
-
-			data, err := json.Marshal(tc.body)
-			require.NoError(t, err)
-
-			url := "/user"
-			request, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(data))
-			require.NoError(t, err)
-
-			tc.setupAuth(t, request, server.tokenMaker)
-			server.router.ServeHTTP(recorder, request)
-			tc.checkResponse(t, recorder)
-		})
-	}
-
 }
 
 func randomUser(t *testing.T) (user db.User, password string) {

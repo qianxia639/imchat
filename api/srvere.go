@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
+	"go.uber.org/zap"
 )
 
 type Server struct {
@@ -21,6 +22,7 @@ type Server struct {
 	tokenMaker token.Maker
 	conf       config.Config
 	manager    *ws.Manager
+	logger     *zap.Logger
 }
 
 func NewServer(conf config.Config, store db.Store, cache cache.Cache) (*Server, error) {
@@ -35,7 +37,7 @@ func NewServer(conf config.Config, store db.Store, cache cache.Cache) (*Server, 
 		conf:       conf,
 	}
 
-	log := utils.Zap(conf.Logger.Path, conf.Logger.Level)
+	server.logger = utils.Zap(conf.Logger.Path, conf.Logger.Level)
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("gender", validGender)
@@ -43,7 +45,6 @@ func NewServer(conf config.Config, store db.Store, cache cache.Cache) (*Server, 
 
 	server.setupRouter()
 
-	log.Info("new server")
 	return server, nil
 }
 
