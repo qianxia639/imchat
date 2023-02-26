@@ -1,4 +1,4 @@
-DB_URL=postgresql://root:root@localhost:5432/imchat?sslmode=disable
+DB_URL=postgresql://root:root@localhost:5432/imchat?sslmode=disable&timeZone=Asia/Shanghai
 SQL_DIR=/opt/qianxia/imchat
 
 server:

@@ -3,6 +3,7 @@ package api
 import (
 	db "IMChat/db/pg/sqlc"
 	"IMChat/token"
+	"IMChat/utils"
 	"IMChat/utils/config"
 
 	"IMChat/cache"
@@ -34,12 +35,15 @@ func NewServer(conf config.Config, store db.Store, cache cache.Cache) (*Server, 
 		conf:       conf,
 	}
 
+	log := utils.Zap(conf.Logger.Path, conf.Logger.Level)
+
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("gender", validGender)
 	}
 
 	server.setupRouter()
 
+	log.Info("new server")
 	return server, nil
 }
 

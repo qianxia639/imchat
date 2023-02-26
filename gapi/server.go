@@ -9,7 +9,6 @@ import (
 
 type Server struct {
 	pb.UnimplementedUserServer
-	pb.UnimplementedMessageServer
 	pb.UnimplementedContactServer
 	store      db.Store
 	tokenMaker token.Maker

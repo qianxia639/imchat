@@ -5,7 +5,7 @@ migrate_url = "file://db/pg/migration"
 
 [server]
 grpc_server_address = "0.0.0.0:9090"
-http_server_address = "0.0.0.0:9091"
+http_server_address = "localhost:9091"
 
 [token]
 token_symmetric_key = "plokmnjiuhbvgytfcxdreszawq564738"
@@ -15,3 +15,7 @@ access_token_duration = "30m"
 address = "localhost:6379"
 password = ""
 db = 0
+
+[logger]
+path = "logs/chat-"
+level = "debug"

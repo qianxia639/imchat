@@ -74,7 +74,6 @@ func runGrpcServer(conf config.Config, store db.Store) {
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterUserServer(grpcServer, server)
-	pb.RegisterMessageServer(grpcServer, server)
 	reflection.Register(grpcServer)
 
 	listener, err := net.Listen("tcp", conf.Server.GrpcServerAddress)

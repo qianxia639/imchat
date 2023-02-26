@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "IM Chat API",
-    "version": "1.2",
+    "version": "1.1",
     "contact": {
       "name": "qianxia",
       "url": "https://github.com/qianxia639"
@@ -10,13 +10,10 @@
   },
   "tags": [
     {
-      "name": "Message"
+      "name": "User"
     },
     {
       "name": "Contact"
-    },
-    {
-      "name": "User"
     }
   ],
   "consumes": [
@@ -26,48 +23,6 @@
     "application/json"
   ],
   "paths": {
-    "/v1/send": {
-      "post": {
-        "operationId": "Message_SendMessage",
-        "responses": {
-          "200": {
-            "description": "A successful response.(streaming responses)",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "result": {
-                  "$ref": "#/definitions/pbSendMessageResponse"
-                },
-                "error": {
-                  "$ref": "#/definitions/rpcStatus"
-                }
-              },
-              "title": "Stream result of pbSendMessageResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "description": " (streaming inputs)",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/pbSendMessageRequest"
-            }
-          }
-        ],
-        "tags": [
-          "Message"
-        ]
-      }
-    },
     "/v1/user": {
       "post": {
         "summary": "Create new user",
@@ -263,22 +218,6 @@
       "type": "object",
       "properties": {
         "token": {
-          "type": "string"
-        }
-      }
-    },
-    "pbSendMessageRequest": {
-      "type": "object",
-      "properties": {
-        "msg": {
-          "type": "string"
-        }
-      }
-    },
-    "pbSendMessageResponse": {
-      "type": "object",
-      "properties": {
-        "msg": {
           "type": "string"
         }
       }

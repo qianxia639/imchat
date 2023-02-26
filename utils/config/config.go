@@ -21,4 +21,8 @@ type Config struct {
 		Password string `mapstructure:"password"`
 		DB       int    `mapstructure:"db"`
 	}
+	Logger struct {
+		Path  string `mapstructure:"path"`
+		Level string `mapstructure:"level"`
+	}
 }
