@@ -1,7 +1,7 @@
 package gapi
 
 import (
-	db "IMChat/db/pg/sqlc"
+	db "IMChat/db/sqlc"
 	"IMChat/pb"
 	"IMChat/token"
 	"IMChat/utils/config"

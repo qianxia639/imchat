@@ -2,7 +2,7 @@ package api
 
 import (
 	"IMChat/cache"
-	db "IMChat/db/pg/sqlc"
+	db "IMChat/db/sqlc"
 	"IMChat/utils"
 	"IMChat/utils/config"
 	"database/sql"

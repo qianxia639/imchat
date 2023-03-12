@@ -1,7 +1,7 @@
 package api
 
 import (
-	db "IMChat/db/pg/sqlc"
+	db "IMChat/db/sqlc"
 	"IMChat/token"
 	"IMChat/utils"
 	"IMChat/utils/config"
@@ -52,16 +52,17 @@ func (server *Server) setupRouter() {
 	router := gin.Default()
 
 	manager := ws.NewManager()
-	go manager.Start()
 
 	router.POST("/user", server.createUser)
 	router.POST("/user/login", server.loginUser)
 
 	authRuters := router.Group("/").Use(authMiddleware(server.tokenMaker))
-	authRuters.PUT("/user", server.updateUser)
-	authRuters.DELETE("/user/:id", server.deleteUser)
+	{
+		authRuters.PUT("/user", server.updateUser)
+		authRuters.DELETE("/user/:id", server.deleteUser)
 
-	router.GET("/ws", server.socketHandler)
+		authRuters.GET("/ws", server.socketHandler)
+	}
 
 	server.router = router
 	server.manager = manager

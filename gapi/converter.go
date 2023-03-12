@@ -1,7 +1,7 @@
 package gapi
 
 import (
-	db "IMChat/db/pg/sqlc"
+	db "IMChat/db/sqlc"
 	"IMChat/pb"
 
 	"google.golang.org/protobuf/types/known/timestamppb"

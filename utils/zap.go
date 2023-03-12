@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"time"
@@ -29,10 +28,10 @@ func Zap(logpath, loglevel string) *zap.Logger {
 
 	write := zapcore.AddSync(newLumberjack(logpath))
 
-	encodreConfig := customEncoderConfig()
+	encoderConfig := customEncoderConfig()
 
-	consoleEncoder := zapcore.NewConsoleEncoder(encodreConfig)
-	fileEncoder := zapcore.NewJSONEncoder(encodreConfig)
+	consoleEncoder := zapcore.NewConsoleEncoder(encoderConfig)
+	fileEncoder := zapcore.NewJSONEncoder(encoderConfig)
 
 	cores := make([]zapcore.Core, 0)
 
@@ -58,7 +57,7 @@ func customEncoderConfig() zapcore.EncoderConfig {
 		TimeKey:     "time",
 		LevelKey:    "level",
 		NameKey:     "logger",
-		CallerKey:   "linenum",
+		CallerKey:   "caller",
 		FunctionKey: zapcore.OmitKey,
 		MessageKey:  "msg",
 		LineEnding:  zapcore.DefaultLineEnding,
@@ -75,10 +74,10 @@ func customEncoderConfig() zapcore.EncoderConfig {
 // 日志切割
 func newLumberjack(logpath string) io.Writer {
 	return &lumberjack.Logger{
-		Filename:   fmt.Sprintf("%s%s.log", logpath, time.Now().UTC().Format("2006-01-02")), // 日志文件路径，路径为空时会使用 os.TempDir()
-		MaxSize:    100,                                                                     // 文件最大大小，默认100M
-		MaxBackups: 30,                                                                      // 日志文件保存最大数量，默认全部保存
-		MaxAge:     7,                                                                       // 保存的最大天数，默认不限
-		Compress:   true,                                                                    // 是否压缩，默认不压缩
+		Filename:   logpath, // 日志文件路径，路径为空时会使用 os.TempDir()
+		MaxSize:    100,     // 文件最大大小，默认100M
+		MaxBackups: 30,      // 日志文件保存最大数量，默认全部保存
+		MaxAge:     7,       // 保存的最大天数，默认不限
+		Compress:   true,    // 是否压缩，默认不压缩
 	}
 }

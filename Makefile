@@ -1,5 +1,4 @@
 DB_URL=postgresql://postgres:postgres@localhost:5432/imchat?sslmode=disable&timeZone=Asia/Shanghai
-SQL_DIR=/opt/qianxia/imchat
 
 server:
 	go run main.go
@@ -11,25 +10,25 @@ createdb:
 	docker exec -it postgres createdb --username=root --owner=root imchat
 
 migrateup:
-	migrate -path db/pg/migration -database "${DB_URL}" -verbose up
+	migrate -path db/migration -database "${DB_URL}" -verbose up
 
 migrateup1:
-	migrate -path db/pg/migration -database "${DB_URL}" -verbose up 1
+	migrate -path db/migration -database "${DB_URL}" -verbose up 1
 
 migratedown:
-	migrate -path db/pg/migration -database "${DB_URL}" -verbose down
+	migrate -path db/migration -database "${DB_URL}" -verbose down
 
 migratedown1:
-	migrate -path db/pg/migration -database "${DB_URL}" -verbose down 1
+	migrate -path db/migration -database "${DB_URL}" -verbose down 1
 
 sqlc:
-	docker run --rm -v $(SQL_DIR):/src -w /src kjconroy/sqlc generate
+	sqlc generate
 
 test:
 	go test -v -cover ./...
 
 mock:
-	mockgen -package mockdb -destination db/pg/mock/store.go IMChat/db/pg/sqlc Store
+	mockgen -package mockdb -destination db/mock/store.go IMChat/db/sqlc Store
 
 proto:
 	rm -f pb/*.go

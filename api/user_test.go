@@ -1,8 +1,8 @@
 package api
 
 import (
-	mockdb "IMChat/db/pg/mock"
-	db "IMChat/db/pg/sqlc"
+	mockdb "IMChat/db/mock"
+	db "IMChat/db/sqlc"
 	"IMChat/utils"
 	"bytes"
 	"database/sql"

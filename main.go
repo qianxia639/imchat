@@ -3,7 +3,7 @@ package main
 import (
 	"IMChat/api"
 	"IMChat/cache"
-	db "IMChat/db/pg/sqlc"
+	db "IMChat/db/sqlc"
 	"IMChat/gapi"
 	"IMChat/pb"
 	"IMChat/utils"

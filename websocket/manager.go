@@ -18,16 +18,19 @@ type Manager struct {
 }
 
 func NewManager() *Manager {
-	return &Manager{
+	manager := &Manager{
 		mutex:      &sync.RWMutex{},
 		Clients:    make(map[int64]*Client),
 		Broadcast:  make(chan []byte),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 	}
+
+	go manager.run()
+	return manager
 }
 
-func (manager *Manager) Start() {
+func (manager *Manager) run() {
 	for {
 		select {
 		case client := <-manager.Register:
