@@ -26,18 +26,18 @@ func (server *Server) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest)
 	user, err := server.store.GetUser(ctx, authPayload.Username)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, status.Errorf(codes.NotFound, "用户名不存在: %s", err)
+			return nil, status.Errorf(codes.NotFound, "用户名不存在: %v", err)
 		}
-		return nil, status.Errorf(codes.NotFound, "user not found: %s", err)
+		return nil, status.Errorf(codes.NotFound, "user not found: %v", err)
 	}
 
 	if user.ID != req.GetId() {
-		return nil, status.Errorf(codes.PermissionDenied, "cannot delete user info: %s", err)
+		return nil, status.Errorf(codes.PermissionDenied, "cannot delete user info: %v", err)
 	}
 
 	err = server.store.DeleteUser(ctx, req.GetId())
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "faild delete user: %s", err)
+		return nil, status.Errorf(codes.Internal, "faild delete user: %v", err)
 	}
 
 	resp := &pb.DeleteUserResponse{

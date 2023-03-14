@@ -31,7 +31,7 @@ type Message struct {
 	Avatar      string `protobuf:"bytes,4,opt,name=avatar,proto3" json:"avatar,omitempty"`                               // 用户图像
 	Content     string `protobuf:"bytes,5,opt,name=content,proto3" json:"content,omitempty"`                             // 文本消息内容
 	ContentType int32  `protobuf:"varint,6,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"` // 消息内容类型: 1.文字 2.普通文件 3.图片 4.音频 5.视频 6.语音聊天 7.视频聊天
-	Type        string `protobuf:"bytes,7,opt,name=type,proto3" json:"type,omitempty"`                                   // 消息传输类型
+	Type        string `protobuf:"bytes,7,opt,name=type,proto3" json:"type,omitempty"`                                   // 消息传输类型: 如果是心跳消息，该内容为heatbeat,在线视频或者音频为webrtc
 	MessageType int32  `protobuf:"varint,8,opt,name=message_type,json=messageType,proto3" json:"message_type,omitempty"` // 消息类型: 1.单聊 2.群聊
 	Url         string `protobuf:"bytes,9,opt,name=url,proto3" json:"url,omitempty"`                                     // 图片、视频、音频的路径
 }

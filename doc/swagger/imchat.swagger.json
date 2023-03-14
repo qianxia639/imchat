@@ -219,6 +219,9 @@
       "properties": {
         "token": {
           "type": "string"
+        },
+        "user": {
+          "$ref": "#/definitions/pbUsers"
         }
       }
     },
@@ -251,6 +254,31 @@
       "properties": {
         "message": {
           "type": "string"
+        }
+      }
+    },
+    "pbUsers": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "nickname": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "registerTime": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

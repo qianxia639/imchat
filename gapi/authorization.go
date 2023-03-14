@@ -15,7 +15,7 @@ const (
 func (server *Server) authorization(ctx context.Context) (*token.Payload, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return nil, fmt.Errorf("missing metadata")
+		return nil, fmt.Errorf("not metadata")
 	}
 
 	values := md.Get(authorizationHeader)

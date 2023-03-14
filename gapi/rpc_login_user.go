@@ -7,6 +7,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
@@ -22,9 +23,9 @@ func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 	user, err := server.store.GetUser(ctx, req.Username)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, status.Errorf(codes.NotFound, "用户名不存在: %s", err)
+			return nil, status.Errorf(codes.NotFound, "用户名不存在: %v", err)
 		}
-		return nil, status.Errorf(codes.NotFound, "user not found: %s", err)
+		return nil, status.Errorf(codes.NotFound, "user not found: %v", err)
 	}
 
 	err = utils.CheckPassword(req.Password, user.Password)
@@ -36,18 +37,24 @@ func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 		Username: user.Username,
 		Password: user.Password,
 	})
-
 	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "用户名或密码错误: %s", err)
+		return nil, status.Errorf(codes.NotFound, "用户名或密码错误: %v", err)
 	}
 
 	token, err := server.tokenMaker.CreateToken(user2.Username, server.conf.Token.AccessTokenDuration)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "filed to create access token: %s", err)
+		return nil, status.Errorf(codes.Internal, "failed to create access token: %v", err)
+	}
+
+	key := fmt.Sprintf("useer:%d_%v", user2.ID, user2.Username)
+	err = server.cache.SetTtlCache(ctx, key, &user, 24*time.Hour)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to set cache: %v", err)
 	}
 
 	resp := &pb.LoginUserResponse{
 		Token: token,
+		User:  converUser(user),
 	}
 
 	return resp, nil

@@ -52,7 +52,7 @@ func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 	if req.Password != nil {
 		hashPassword, err := utils.HashPassword(*req.Password)
 		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to hash password: %s", err)
+			return nil, status.Errorf(codes.Internal, "failed to hash password: %v", err)
 		}
 		arg.Password = sql.NullString{
 			String: hashPassword,
@@ -60,13 +60,16 @@ func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 		}
 	}
 
-	_, err = server.store.UpdateUser(ctx, arg)
+	user, err := server.store.UpdateUser(ctx, arg)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, status.Errorf(codes.NotFound, "user not found: %s", err)
+			return nil, status.Errorf(codes.NotFound, "user not found: %v", err)
 		}
-		return nil, status.Errorf(codes.Internal, "failed update user: %s", err)
+		return nil, status.Errorf(codes.Internal, "failed update user: %v", err)
 	}
+
+	key := fmt.Sprintf("user:%d_%v", user.ID, user.Username)
+	_ = server.cache.SetCache(ctx, key, user)
 
 	resp := &pb.UpdateUserResponse{
 		Message: "Update User Successfully",

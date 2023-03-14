@@ -48,9 +48,9 @@ func main() {
 
 	cache := cache.NewRedisCache(utils.InitRedis(conf))
 
-	// go runGatewayServer(conf, store)
-	// runGrpcServer(conf, store)
-	runGinServer(conf, store, cache)
+	go runGatewayServer(conf, store, cache)
+	runGrpcServer(conf, store, cache)
+	// runGinServer(conf, store, cache)
 }
 
 func runDBMigrate(migrationUrl, dbSource string) {
@@ -66,8 +66,8 @@ func runDBMigrate(migrationUrl, dbSource string) {
 	log.Println("db migrated successfully")
 }
 
-func runGrpcServer(conf config.Config, store db.Store) {
-	server, err := gapi.NewServer(conf, store)
+func runGrpcServer(conf config.Config, store db.Store, cache cache.Cache) {
+	server, err := gapi.NewServer(conf, store, cache)
 	if err != nil {
 		log.Fatal("cannot create server: ", err)
 	}
@@ -89,8 +89,8 @@ func runGrpcServer(conf config.Config, store db.Store) {
 	}
 }
 
-func runGatewayServer(conf config.Config, store db.Store) {
-	server, err := gapi.NewServer(conf, store)
+func runGatewayServer(conf config.Config, store db.Store, cache cache.Cache) {
+	server, err := gapi.NewServer(conf, store, cache)
 	if err != nil {
 		log.Fatal("cannot create server: ", err)
 	}
